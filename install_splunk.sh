@@ -1,68 +1,70 @@
 #!/bin/bash
 
 #======================
-#Instalacion de Splunk
+# Splunk Installation
 #======================
 
 echo "================================"
-echo "Iniciando instalacion de Splunk"
+echo "Starting Splunk installation"
 echo "================================"
 
-#Variables
+# Variables
 SPLUNK_URL="https://download.splunk.com/products/splunk/releases/9.3.0/linux/splunk-9.3.0-51ccf43db5bd-linux-2.6-amd64.deb"
 SPLUNK_DEB="splunk-9.3.0-51ccf43db5bd-linux-2.6-amd64.deb"
 SPLUNK_DIR="/opt/splunk/bin"
 
-#Verificar y limpiar locks de dpkg si quedaron atascados
+# Check for and wait on a locked dpkg frontend
 if sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; then
-	echo "[!] dpkg está en uso por otro proceso, esperando..."
-	while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-		sleep 2
-	done
+    echo "[!] dpkg is in use by another process, waiting..."
+    while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+        sleep 2
+    done
 fi
 
-#Descarga de Splunk
-echo "[+] Descargando Splunk..."
+# Download Splunk
+echo "[+] Downloading Splunk..."
 wget -O "$SPLUNK_DEB" "$SPLUNK_URL"
 
-#Verificacion del archivo descargado
+# Verify the file was downloaded
 if [ -f "$SPLUNK_DEB" ]; then
-	echo "[+] Archivo descargado correctamente"
+    echo "[+] File downloaded successfully"
 else
-	echo "[-] Error: El archivo de Splunk no se descargó."
-	exit 1
+    echo "[-] Error: Splunk file was not downloaded."
+    exit 1
 fi
 
-#Instalar Splunk
-echo "[+] Instalando Splunk"
+# Install Splunk
+echo "[+] Installing Splunk"
 sudo dpkg -i "$SPLUNK_DEB"
 
-#Verificar si dpkg tuvo errores (ej. dependencias faltantes) y corregirlos
+# Check if dpkg reported errors (e.g. missing dependencies) and fix them
 if [ $? -ne 0 ]; then
-	echo "[!] dpkg reportó errores, intentando resolver dependencias..."
-	sudo apt-get install -f -y
+    echo "[!] dpkg reported errors, attempting to resolve dependencies..."
+    sudo apt-get install -f -y
 fi
 
-#Verificar que splunk se instaló
+# Verify Splunk was installed
 if [ -d "$SPLUNK_DIR" ]; then
-	echo "[+] Splunk instalado correctamente"
+    echo "[+] Splunk installed successfully"
 else
-	echo "[-] Error: Splunk no se instaló correctamente"
-	exit 1
+    echo "[-] Error: Splunk was not installed correctly"
+    exit 1
 fi
 
-#Directorio de Splunk
+# Splunk directory
 cd "$SPLUNK_DIR" || exit 1
 
-#Habilitarlo como servicio
-echo "[+] Habilitando Splunk para iniciar en el arranque"
+# Enable it as a service
+echo "[+] Enabling Splunk to start on boot"
 sudo ./splunk enable boot-start --accept-license
 
-#Iniciar Splunk
-echo "[+] Iniciando Splunk"
+# Start Splunk
+echo "[+] Starting Splunk"
 sudo ./splunk start
 
-#Mensaje final
+# Final message
 echo "================================"
-echo "Splunk instalado y en ejecución"
+echo "Splunk installed and running"
 echo "================================"
+
+
