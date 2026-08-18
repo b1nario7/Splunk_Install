@@ -1,72 +1,53 @@
-[README.md](https://github.com/user-attachments/files/31161370/README.md)
-# Splunk_Install
-
-Script en Bash para automatizar la descarga e instalación de Splunk en un sistema Linux basado en Debian/Ubuntu (usa `dpkg` y `apt`).
-
-## ¿Qué hace el script?
-
-1. Descarga el paquete `.deb` de Splunk desde la URL oficial.
-2. Verifica que la descarga se haya completado correctamente.
-3. Instala Splunk usando `dpkg`.
-4. Si `dpkg` falla por dependencias faltantes, intenta corregirlo automáticamente.
-5. Verifica que la instalación haya sido exitosa.
-6. Habilita Splunk para que inicie automáticamente al arrancar el sistema.
-7. Inicia el servicio de Splunk.
-
-## Requisitos previos
-
-- Sistema Linux basado en Debian/Ubuntu (usa `dpkg` y `apt`).
-- Acceso a `sudo`.
-- Conexión a internet.
-- `wget` instalado.
-
-## Uso
-
-Dale permisos de ejecución al script y córrelo:
-
+Splunk_Install
+🇬🇧 English | 🇪🇸 Español
+A Bash script that automates the download and installation of Splunk on a Debian/Ubuntu-based Linux system (uses `dpkg` and `apt`).
+What the script does
+Downloads the Splunk `.deb` package from the official URL.
+Verifies the download completed successfully.
+Installs Splunk using `dpkg`.
+If `dpkg` fails due to missing dependencies, attempts to fix them automatically.
+Verifies the installation was successful.
+Enables Splunk to start automatically on boot.
+Starts the Splunk service.
+Prerequisites
+Debian/Ubuntu-based Linux system (uses `dpkg` and `apt`).
+`sudo` access.
+Internet connection.
+`wget` installed.
+Usage
+Give the script execute permissions and run it:
 ```bash
 chmod +x install_splunk.sh
 ./install_splunk.sh
 ```
-
-El script pedirá tu contraseña de `sudo` para instalar el paquete y habilitar el servicio.
-
-## Verificar que Splunk está corriendo
-
-Una vez finalizado el script, puedes comprobar el estado del servicio con:
-
+The script will ask for your `sudo` password to install the package and enable the service.
+Verifying that Splunk is running
+Once the script finishes, you can check the service status with:
 ```bash
 sudo /opt/splunk/bin/splunk status
 ```
-
-Y acceder a la interfaz web desde el navegador en:
-
+And access the web interface from your browser at:
 ```
-http://<IP-del-servidor>:8000
+http://<server-IP>:8000
 ```
-
-## Problema conocido: dpkg lock
-
-Si el script falla en la etapa de instalación con un error como:
-
+Known issue: dpkg lock
+If the script fails during installation with an error like:
 ```
 dpkg: error: dpkg frontend lock was locked by another process with pid XXXX
 ```
-
-Significa que otro proceso (por ejemplo `unattended-upgrades`) tiene bloqueado el gestor de paquetes. El script incluye una espera automática para este caso, pero si el problema persiste, puedes revisar manualmente:
-
+It means another process (e.g. `unattended-upgrades`) has the package manager locked. The script includes an automatic wait for this case, but if the problem persists, you can check manually:
 ```bash
 sudo fuser /var/lib/dpkg/lock-frontend
 ```
-
-Si no hay ningún proceso activo usando el lock, puedes liberarlo con:
-
+If no process is actively using the lock, you can release it with:
 ```bash
 sudo rm -f /var/lib/dpkg/lock-frontend
 sudo dpkg --configure -a
 ```
-
-⚠️ Nunca elimines el archivo de lock si hay un proceso real usándolo — puede corromper el sistema de paquetes.
+⚠️ Never remove the lock file if a real process is using it — doing so can corrupt the package management system.
+Notes
+The Splunk version and download URL are defined as variables at the top of the script (`SPLUNK_URL`, `SPLUNK_DEB`), so they can easily be updated to install a different version.
+This script was tested manually; minor adjustments may be needed depending on the exact Linux distribution or version used.
 
 ## Notas
 
